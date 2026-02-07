@@ -77,7 +77,7 @@ export const AdminPanel: React.FC<Props> = ({ onExit }) => {
 
         <div className="flex items-center gap-2">
           <button 
-            onClick={loadData} 
+            on Click={loadData} 
             className={`p-2 rounded-lg text-neutral-400 hover:text-white transition-all ${isRefreshing ? 'animate-spin text-blue-500' : ''}`}
           >
             <RefreshCw size={18} />
