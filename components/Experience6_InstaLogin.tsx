@@ -1,104 +1,56 @@
 
-import React, { useState, useEffect } from 'react';
-import { Lock, Eye, EyeOff, ShieldCheck, ChevronRight } from 'lucide-react';
+import React from 'react';
+import { Instagram } from 'lucide-react';
 
 interface Props {
   onComplete: () => void;
 }
 
 export const Experience6_InstaLogin: React.FC<Props> = ({ onComplete }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username || !password) return;
-    
-    setStatus('loading');
-    setTimeout(() => {
-      setStatus('success');
-      setTimeout(onComplete, 1500);
-    }, 2000);
-  };
-
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-6 bg-gradient-to-b from-neutral-900 to-black">
-      <div className="w-full max-w-sm space-y-8">
-        {/* Mock Instagram Logo/Identity */}
-        <div className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="w-20 h-20 rounded-[2rem] bg-gradient-to-tr from-yellow-500 via-red-600 to-purple-800 p-[2px] shadow-2xl">
-            <div className="w-full h-full bg-black rounded-[1.95rem] flex items-center justify-center">
-              <Lock size={32} className="text-white" />
-            </div>
-          </div>
-          <div className="text-center">
-            <h2 className="text-3xl font-black italic tracking-tighter text-white uppercase italic">Vladimir <span className="text-red-600">Private</span></h2>
-            <p className="text-neutral-500 text-xs font-bold tracking-widest uppercase mt-1">Acceso al Archivo de Ejecución</p>
-          </div>
+    <div className="fixed inset-0 bg-white flex flex-col items-center justify-center p-8">
+      <div className="w-full max-w-xs flex flex-col items-center gap-8">
+        <h1 className="text-4xl font-serif italic text-neutral-800">Instagram</h1>
+        
+        <div className="w-full space-y-3">
+          <input 
+            type="text" 
+            placeholder="Usuario, teléfono o correo" 
+            defaultValue="EJECUTOR_8M"
+            className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded text-sm focus:border-neutral-400 outline-none"
+            readOnly
+          />
+          <input 
+            type="password" 
+            placeholder="Contraseña" 
+            defaultValue="BIENESTAR_REAL"
+            className="w-full p-3 bg-neutral-50 border border-neutral-200 rounded text-sm focus:border-neutral-400 outline-none"
+            readOnly
+          />
+          <button 
+            onClick={onComplete}
+            className="w-full py-2 bg-[#0095f6] text-white font-bold rounded text-sm hover:bg-[#1877f2] transition-colors"
+          >
+            Entrar al archivo privado
+          </button>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4 animate-in fade-in duration-1000 delay-300">
-          <div className="space-y-2">
-            <input 
-              type="text" 
-              placeholder="Nombre de usuario o teléfono"
-              className="w-full bg-neutral-900 border border-neutral-800 px-5 py-4 rounded-xl text-sm focus:outline-none focus:border-red-600 transition-all placeholder:text-neutral-600 text-white"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-            <div className="relative">
-              <input 
-                type={showPassword ? "text" : "password"} 
-                placeholder="Contraseña del sistema"
-                className="w-full bg-neutral-900 border border-neutral-800 px-5 py-4 rounded-xl text-sm focus:outline-none focus:border-red-600 transition-all placeholder:text-neutral-600 text-white"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <button 
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-600 hover:text-neutral-300 transition-colors"
-                title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
+        <div className="w-full flex items-center gap-3">
+          <div className="flex-1 h-[1px] bg-neutral-200" />
+          <span className="text-[12px] text-neutral-400 font-bold uppercase">Aviso de seguridad</span>
+          <div className="flex-1 h-[1px] bg-neutral-200" />
+        </div>
 
-          <button 
-            type="submit"
-            disabled={status !== 'idle'}
-            className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-sm transition-all flex items-center justify-center gap-3 ${
-              status === 'success' 
-              ? 'bg-green-600 text-white' 
-              : 'bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-900/20 active:scale-[0.98]'
-            }`}
-          >
-            {status === 'idle' && (
-              <>Ingresar al Archivo <ChevronRight size={18} /></>
-            )}
-            {status === 'loading' && (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            )}
-            {status === 'success' && (
-              <>Acceso Concedido <ShieldCheck size={18} /></>
-            )}
-          </button>
-        </form>
-
-        <div className="pt-8 text-center space-y-6 opacity-30">
-          <div className="flex items-center justify-center gap-4 text-neutral-500">
-             <div className="h-[1px] flex-1 bg-neutral-800" />
-             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Cifrado Militar</span>
-             <div className="h-[1px] flex-1 bg-neutral-800" />
-          </div>
-          <p className="text-[9px] text-neutral-600 uppercase font-bold max-w-xs mx-auto leading-relaxed">
-            Este terminal es propiedad del mecanismo de bienestar de Vladimir. El acceso no autorizado será monitoreado.
+        <div className="text-center space-y-4">
+          <p className="text-sm text-neutral-500 leading-relaxed px-4">
+            Este acceso no es público.<br/>
+            Es un respaldo interno.<br/>
+            <span className="font-bold text-neutral-800">Entra. Observa. Decide.</span>
           </p>
+          <div className="flex items-center justify-center gap-2 text-neutral-400">
+            <Instagram size={16} />
+            <span className="text-xs">Archive Access v2.4</span>
+          </div>
         </div>
       </div>
     </div>

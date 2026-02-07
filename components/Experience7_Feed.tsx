@@ -1,154 +1,149 @@
 
-import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, User, ShieldCheck, CheckCircle2, ShoppingCart } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Heart, MessageCircle, Send, Bookmark, MoreVertical, ChevronDown, Volume2, VolumeX } from 'lucide-react';
 
 interface Props {
   onComplete: () => void;
 }
 
-const posts = [
-  {
-    id: 1,
-    user: "Vladimir_Bienestar",
-    verified: true,
-    image: "https://res.cloudinary.com/dtwegeovt/image/upload/v1770438349/IMG_7838_rv6rts.jpg",
-    likes: "12,482",
-    caption: "La ejecución no es una promesa, es un hecho. Transformando la realidad desde el primer día. #VladimirEjecuta #LaLeyDelBienestar",
-    comments: "348",
-    time: "HACE 2 HORAS"
+const videoData = [
+  { 
+    id: 1, 
+    url: "https://res.cloudinary.com/dtwegeovt/video/upload/v1770434181/copy_7CDDBBD5-ACCB-4C8C-9684-154EAE50E1D6_d3kmr0.mov",
+    caption: "Garantizando tu bienestar. La ejecución es ahora."
   },
-  {
-    id: 2,
-    user: "Vladimir_Oficial",
-    verified: true,
-    image: "https://res.cloudinary.com/dtwegeovt/image/upload/v1770438349/IMG_7839_zffs75.jpg",
-    likes: "45,901",
-    caption: "Mientras otros hablan, nosotros garantizamos tu tranquilidad. El mecanismo ya está en marcha. #HechosReales #BienestarCiudadano",
-    comments: "1,200",
-    time: "HACE 5 HORAS"
+  { 
+    id: 2, 
+    url: "https://res.cloudinary.com/dtwegeovt/video/upload/v1770434180/copy_5DEF6A3A-01F7-4B27-AFA4-01CBC0BFED21_e1pvex.mov",
+    caption: "Antes se prometía, hoy se ejecuta. Vladimir responde."
   },
-  {
-    id: 3,
-    user: "Ejecucion_Total",
-    verified: false,
-    image: "https://res.cloudinary.com/dtwegeovt/image/upload/v1770438349/IMG_7837_yckh46.jpg",
-    likes: "8,230",
-    caption: "¿Estás listo para el cambio que se siente? Vladimir te protege. El bienestar es hoy.",
-    comments: "156",
-    time: "HACE 1 DÍA"
+  { 
+    id: 3, 
+    url: "https://res.cloudinary.com/dtwegeovt/video/upload/v1770434181/copy_C248C514-642B-4C58-927F-CF83211B38CA_yykqfg.mov",
+    caption: "El bienestar no es un eslogan, es un derecho que vamos a ejecutar."
   }
 ];
 
 export const Experience7_Feed: React.FC<Props> = ({ onComplete }) => {
-  const [likedPosts, setLikedPosts] = useState<number[]>([]);
-  const [showExit, setShowExit] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   useEffect(() => {
-    // Mostrar el botón de salida después de un tiempo para obligar al scroll
-    const timer = setTimeout(() => setShowExit(true), 5000);
-    return () => clearTimeout(timer);
+    const observerOptions = {
+      root: containerRef.current,
+      threshold: 0.6,
+    };
+
+    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const index = Number(entry.target.getAttribute('data-index'));
+          setActiveIdx(index);
+          const video = videoRefs.current[index];
+          if (video) {
+            video.currentTime = 0;
+            video.play().catch(e => console.log("Auto-play blocked", e));
+          }
+        } else {
+          const index = Number(entry.target.getAttribute('data-index'));
+          const video = videoRefs.current[index];
+          if (video) video.pause();
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, observerOptions);
+    const videoContainers = containerRef.current?.querySelectorAll('.video-snap-item');
+    videoContainers?.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
-  const toggleLike = (id: number) => {
-    setLikedPosts(prev => 
-      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
-    );
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMuted(!isMuted);
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#050505] flex flex-col overflow-hidden">
-      {/* Header Estilo Red Social */}
-      <header className="px-5 py-4 border-b border-neutral-900 bg-black/80 backdrop-blur-md flex items-center justify-between shrink-0">
-        <h2 className="text-xl font-black italic tracking-tighter text-white uppercase italic">Vladimir <span className="text-red-600">Feed</span></h2>
-        <div className="flex items-center gap-4">
-          <ShieldCheck size={22} className="text-blue-500 animate-pulse" />
-          <User size={22} className="text-neutral-500" />
-        </div>
-      </header>
-
-      {/* Feed Scrollable */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar bg-neutral-950">
-        <div className="max-w-md mx-auto space-y-2 py-4">
-          {posts.map((post) => (
-            <article key={post.id} className="bg-black border-y border-neutral-900 md:border md:rounded-xl md:mb-6">
-              <div className="p-3 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-yellow-500 to-red-600 p-[2px]">
-                    <div className="w-full h-full bg-black rounded-full flex items-center justify-center p-0.5">
-                       <img src={post.image} className="w-full h-full rounded-full object-cover grayscale" />
-                    </div>
+    <div className="fixed inset-0 bg-[#121212] flex items-center justify-center overflow-hidden">
+      <div 
+        ref={containerRef}
+        className="relative w-full max-w-[450px] h-[100dvh] bg-black overflow-y-scroll snap-y snap-mandatory no-scrollbar scroll-smooth"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {videoData.map((v, i) => (
+          <div key={v.id} data-index={i} className="video-snap-item relative w-full h-[100dvh] snap-start snap-always flex flex-col">
+            <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
+              <video
+                ref={el => videoRefs.current[i] = el}
+                src={v.url}
+                className="w-full h-full object-cover"
+                loop
+                playsInline
+                muted={isMuted}
+                onClick={() => {
+                  const video = videoRefs.current[i];
+                  if (video) {
+                    video.paused ? video.play() : video.pause();
+                  }
+                }}
+              />
+              <button 
+                onClick={toggleMute}
+                className="absolute top-6 right-6 z-20 bg-black/40 p-2.5 rounded-full backdrop-blur-md text-white border border-white/10 active:scale-90 transition-transform"
+              >
+                {isMuted ? <VolumeX size={22} /> : <Volume2 size={22} />}
+              </button>
+              <div className="absolute right-4 bottom-32 flex flex-col gap-6 items-center z-10">
+                <div className="flex flex-col items-center group">
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md border border-white/5 transition-transform active:scale-90">
+                    <Heart className="text-white fill-red-600 border-red-600" size={24} />
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-white">{post.user}</span>
-                    {post.verified && <CheckCircle2 size={12} className="text-blue-500 fill-blue-500" />}
+                  <span className="text-[10px] text-white mt-1 font-bold drop-shadow-lg">42.1K</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md border border-white/5">
+                    <MessageCircle className="text-white" size={24} />
+                  </div>
+                  <span className="text-[10px] text-white mt-1 font-bold drop-shadow-lg">1.2K</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-md border border-white/5">
+                    <Send className="text-white" size={24} />
                   </div>
                 </div>
-                <MoreHorizontal size={18} className="text-neutral-600" />
+                <Bookmark className="text-white" size={24} />
+                <MoreVertical className="text-white" size={24} />
               </div>
-
-              <div className="aspect-square bg-neutral-900 overflow-hidden">
-                <img 
-                  src={post.image} 
-                  alt="Post" 
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-
-              <div className="p-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <button onClick={() => toggleLike(post.id)}>
-                      <Heart 
-                        size={24} 
-                        className={`transition-colors ${likedPosts.includes(post.id) ? 'text-red-600 fill-red-600' : 'text-white'}`} 
-                      />
-                    </button>
-                    <MessageCircle size={24} className="text-white" />
-                    <Send size={24} className="text-white" />
+              <div className="absolute left-0 bottom-0 w-full z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-6 pt-12">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-red-600 border-2 border-white/30 flex items-center justify-center font-black text-lg italic shadow-xl">V</div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-white tracking-wide flex items-center gap-1">
+                      vladimir.ejecucion
+                      <div className="w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" className="w-2 h-2 text-white fill-current"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      </div>
+                    </span>
+                    <span className="text-[10px] text-neutral-300 font-medium">Audio original • Vladimir</span>
                   </div>
-                  <Bookmark size={24} className="text-white" />
+                  <button className="ml-auto text-[11px] font-bold border border-white/40 bg-white/10 px-4 py-1.5 rounded-lg backdrop-blur-sm active:bg-white/20">Seguir</button>
                 </div>
-
-                <div className="space-y-1">
-                  <span className="text-xs font-bold text-white mb-1 block">{post.likes} Me gusta</span>
-                  <p className="text-xs text-neutral-200 leading-relaxed">
-                    <span className="font-bold mr-2">{post.user}</span>
-                    {post.caption}
-                  </p>
-                  <button className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest pt-1">Ver los {post.comments} comentarios</button>
-                </div>
-                <div className="text-[10px] text-neutral-600 font-bold uppercase">{post.time}</div>
+                <p className="text-sm text-white font-medium leading-relaxed drop-shadow-lg pr-12">
+                  {v.caption} <span className="text-blue-400 font-bold">#EjecucionReal #Bienestar #Vladimir</span>
+                </p>
+                {i === videoData.length - 1 ? (
+                  <button onClick={(e) => { e.stopPropagation(); onComplete(); }} className="mt-6 w-full bg-red-600 text-white font-black text-sm uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(220,38,38,0.4)] active:scale-[0.98] transition-all">Finalizar Archivo</button>
+                ) : (
+                  <div className="mt-4 flex items-center gap-2 text-[10px] text-white/50 font-bold uppercase tracking-widest animate-pulse"><span>Desliza para más</span><ChevronDown size={14} /></div>
+                )}
               </div>
-            </article>
-          ))}
-          
-          <div className="py-20 px-8 text-center space-y-4">
-             <div className="w-12 h-12 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mx-auto mb-4">
-                <ShieldCheck size={24} className="text-red-600" />
-             </div>
-             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-xs mx-auto">Has visto el archivo de ejecución de hoy. El bienestar se mantiene bajo guardia.</p>
+            </div>
           </div>
-        </div>
+        ))}
       </div>
-
-      {/* Footer / Call to Action */}
-      <footer className="p-6 border-t border-neutral-900 bg-black/95 backdrop-blur-xl shrink-0">
-        <button 
-          onClick={onComplete}
-          className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-sm transition-all flex items-center justify-center gap-3 shadow-2xl ${
-            showExit 
-            ? 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95' 
-            : 'bg-neutral-800 text-neutral-500 cursor-not-allowed opacity-50'
-          }`}
-          disabled={!showExit}
-        >
-          {showExit ? (
-            <>Quiero Acceso al Plan Total <ShoppingCart size={18} /></>
-          ) : (
-            <>Analizando Ejecución...</>
-          )}
-        </button>
-      </footer>
+      <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .vertical-text { writing-mode: vertical-rl; text-orientation: mixed; }`}</style>
     </div>
   );
 };
