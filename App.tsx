@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useeffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { FunnelStep, UserSession } from './types';
 import { Experience0_Welcome } from './components/Experience0_Welcome';
 import { Experience1_Call } from './components/Experience1_Call';
@@ -26,7 +26,7 @@ const App: React.FC = () => {
   const lastClickTime = useRef<number>(0);
 
   // Listener Global de Clics para el Easter Egg
-  useEffect(() => {
+  useE ffect(() => {
     const handleWindowClick = () => {
       const now = Date.now();
       
