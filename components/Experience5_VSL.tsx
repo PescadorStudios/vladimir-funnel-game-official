@@ -23,6 +23,7 @@ export const Experience5_VSL: React.FC<Props> = ({ onComplete }) => {
         })
         .catch(err => {
           console.error("Video play failed:", err);
+          // Re-intento forzado en caso de bloqueo de política de navegador
           if (videoRef.current) videoRef.current.play();
           setIsPlaying(true);
         });
@@ -43,10 +44,14 @@ export const Experience5_VSL: React.FC<Props> = ({ onComplete }) => {
 
   return (
     <div className="fixed inset-0 bg-[#020202] flex flex-col items-center justify-center overflow-hidden">
+      {/* Background Decorative Glows */}
       <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-red-600/10 rounded-full blur-[120px]" />
       </div>
+
       <div className="relative z-10 w-full h-full max-w-[450px] mx-auto flex flex-col shadow-2xl bg-black overflow-hidden">
+        
+        {/* Encrypted Header */}
         <div className="absolute top-0 left-0 w-full z-20 px-6 py-8 flex flex-col gap-2 pointer-events-none">
           <div className="flex items-center gap-3 text-red-600 animate-pulse">
             <ShieldCheck size={16} />
@@ -63,7 +68,11 @@ export const Experience5_VSL: React.FC<Props> = ({ onComplete }) => {
              </div>
           </div>
         </div>
+
+        {/* Video Player Container */}
         <div className="flex-1 relative flex items-center justify-center bg-black overflow-hidden">
+          
+          {/* El video siempre está presente pero oculto si no está en play */}
           <video
             ref={videoRef}
             src={VSL_VIDEO_URL}
@@ -78,6 +87,8 @@ export const Experience5_VSL: React.FC<Props> = ({ onComplete }) => {
               }
             }}
           />
+
+          {/* Overlay de inicio (solo visible antes de dar Play) */}
           {!isPlaying && (
             <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 text-center bg-black">
               <div className="space-y-6 animate-in zoom-in duration-500">
@@ -97,6 +108,8 @@ export const Experience5_VSL: React.FC<Props> = ({ onComplete }) => {
               </div>
             </div>
           )}
+          
+          {/* Controles de Mute y Progreso (Solo cuando el video corre) */}
           {isPlaying && !videoEnded && (
             <>
               <button 
@@ -105,6 +118,7 @@ export const Experience5_VSL: React.FC<Props> = ({ onComplete }) => {
               >
                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
               </button>
+
               <div className="absolute bottom-0 left-0 w-full h-1 bg-neutral-900 z-30">
                 <div 
                   className="h-full bg-red-600 transition-all duration-300" 
@@ -113,6 +127,8 @@ export const Experience5_VSL: React.FC<Props> = ({ onComplete }) => {
               </div>
             </>
           )}
+
+          {/* End State CTA */}
           {videoEnded && (
             <div className="absolute inset-0 z-40 bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center p-8 animate-in fade-in duration-700">
               <div className="space-y-8 text-center max-w-xs">
@@ -133,6 +149,8 @@ export const Experience5_VSL: React.FC<Props> = ({ onComplete }) => {
             </div>
           )}
         </div>
+
+        {/* Footer decoration */}
         <div className="p-6 bg-[#050505] border-t border-neutral-900">
            <div className="flex justify-between items-center opacity-40">
               <div className="flex flex-col">
@@ -146,6 +164,7 @@ export const Experience5_VSL: React.FC<Props> = ({ onComplete }) => {
            </div>
         </div>
       </div>
+
       <style>{`
         @keyframes spin-slow {
           from { transform: rotate(0deg); }
